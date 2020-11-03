@@ -20,5 +20,7 @@ In this project, we will develop a REST Api to parse a JSON schema model divided
 
 ## Pre-requisites
 1. Redis Server
+`$ brew install redis`
+`$ redis-server /usr/local/etc/redis.conf`
 2. Elasticsearch and Kibana(Local or cloud based)
 3. Apache Kafka
