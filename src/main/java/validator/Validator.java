@@ -35,12 +35,12 @@ public class Validator {
     }
 	
 	public static Boolean isJSONValid(JSONObject object) throws IOException, ProcessingException {
-
 		try {
 			schema.validate(object);
 			return true;
 		}
 		catch (ValidationException e) {
+			e.printStackTrace();
 			return false;
 		}
 		

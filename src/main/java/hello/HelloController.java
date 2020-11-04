@@ -29,10 +29,11 @@ public class HelloController{
         return "Greetings from Yiyi!";
     }
     
-    @RequestMapping(value="/plan", method=RequestMethod.POST)
-    public String addPlan(@RequestBody JSONObject jsonObject, HttpServletResponse response) throws IOException, ProcessingException
+    @RequestMapping(value="/plan", method=RequestMethod.POST, consumes = "application/json")
+    public String addPlan(@RequestBody String data, HttpServletResponse response) throws IOException, ProcessingException
     {
-		String data = jsonObject.toString();
+		
+		JSONObject jsonObject = new JSONObject(data);
     	Boolean jsonValidity = Validator.isJSONValid(jsonObject);
     	if(jsonValidity == true) {
 			String uuid = UUID.randomUUID().toString();
@@ -64,18 +65,18 @@ public class HelloController{
     }
     
     @RequestMapping(value="/plan/{id}", method=RequestMethod.PUT)
-    public String updatePlan(@RequestBody JSONObject jsonObject, @PathVariable String id, HttpServletResponse response) throws IOException, ProcessingException
+    public String updatePlan(@RequestBody String data, @PathVariable String id, HttpServletResponse response) throws IOException, ProcessingException
     {
     	jedis.connect();
     	String key = id;
-    	String data = jsonObject.toString();
+		JSONObject jsonObject = new JSONObject(data);
     	Boolean jsonValidity = Validator.isJSONValid(jsonObject);
     	if(jsonValidity == true) {
     		jedis.set(key, data);
     		return key + " updated successfully!";
     	}
     	else {
-    		return "Invalid JSON!";
+    		return "JSON Schema not valid!";
     	}
     }
 }
