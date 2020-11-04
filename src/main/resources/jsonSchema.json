@@ -1,211 +1,204 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
-  "title": "The Root Schema",
   "properties": {
     "planCostShares": {
       "type": "object",
-      "title": "The Plancostshares Schema",
       "properties": {
         "deductible": {
-          "type": "integer",
-          "title": "The Deductible Schema",
-          "default": 0,
-          "examples": [
-            2000
-          ]
+          "type": "integer"
         },
         "_org": {
-          "type": "string",
-          "title": "The _org Schema",
-          "default": "",
-          "examples": [
-            "example.com"
-          ]
+          "type": "string"
         },
         "copay": {
-          "type": "integer",
-          "title": "The Copay Schema",
-          "default": 0,
-          "examples": [
-            10
-          ]
+          "type": "integer"
         },
         "objectId": {
-          "type": "string",
-          "title": "The Objectid Schema",
-          "default": "",
-          "examples": [
-            "1234vxc2324sdf"
-          ]
+          "type": "string"
         },
         "objectType": {
-          "type": "string",
-          "title": "The Objecttype Schema",
-          "default": "",
-          "examples": [
-            "membercostshare"
-          ]
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "deductible",
+        "_org",
+        "copay",
+        "objectId",
+        "objectType"
+      ]
     },
     "linkedPlanServices": {
       "type": "array",
-      "title": "The Linkedplanservices Schema",
-      "items": {
-        "type": "object",
-        "title": "The Items Schema",
-        "properties": {
-          "linkedService": {
-            "type": "object",
-            "title": "The Linkedservice Schema",
-            "properties": {
-              "_org": {
-                "type": "string",
-                "title": "The _org Schema",
-                "default": "",
-                "examples": [
-                  "example.com"
-                ]
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "linkedService": {
+              "type": "object",
+              "properties": {
+                "_org": {
+                  "type": "string"
+                },
+                "objectId": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
               },
-              "objectId": {
-                "type": "string",
-                "title": "The Objectid Schema",
-                "default": "",
-                "examples": [
-                  "1234520xvc30asdf"
-                ]
+              "required": [
+                "_org",
+                "objectId",
+                "objectType",
+                "name"
+              ]
+            },
+            "planserviceCostShares": {
+              "type": "object",
+              "properties": {
+                "deductible": {
+                  "type": "integer"
+                },
+                "_org": {
+                  "type": "string"
+                },
+                "copay": {
+                  "type": "integer"
+                },
+                "objectId": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string"
+                }
               },
-              "objectType": {
-                "type": "string",
-                "title": "The Objecttype Schema",
-                "default": "",
-                "examples": [
-                  "service"
-                ]
-              },
-              "name": {
-                "type": "string",
-                "title": "The Name Schema",
-                "default": "",
-                "examples": [
-                  "Yearly physical"
-                ]
-              }
+              "required": [
+                "deductible",
+                "_org",
+                "copay",
+                "objectId",
+                "objectType"
+              ]
+            },
+            "_org": {
+              "type": "string"
+            },
+            "objectId": {
+              "type": "string"
+            },
+            "objectType": {
+              "type": "string"
             }
           },
-          "planserviceCostShares": {
-            "type": "object",
-            "title": "The Planservicecostshares Schema",
-            "properties": {
-              "deductible": {
-                "type": "integer",
-                "title": "The Deductible Schema",
-                "default": 0,
-                "examples": [
-                  10
-                ]
+          "required": [
+            "linkedService",
+            "planserviceCostShares",
+            "_org",
+            "objectId",
+            "objectType"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "linkedService": {
+              "type": "object",
+              "properties": {
+                "_org": {
+                  "type": "string"
+                },
+                "objectId": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
               },
-              "_org": {
-                "type": "string",
-                "title": "The _org Schema",
-                "default": "",
-                "examples": [
-                  "example.com"
-                ]
+              "required": [
+                "_org",
+                "objectId",
+                "objectType",
+                "name"
+              ]
+            },
+            "planserviceCostShares": {
+              "type": "object",
+              "properties": {
+                "deductible": {
+                  "type": "integer"
+                },
+                "_org": {
+                  "type": "string"
+                },
+                "copay": {
+                  "type": "integer"
+                },
+                "objectId": {
+                  "type": "string"
+                },
+                "objectType": {
+                  "type": "string"
+                }
               },
-              "copay": {
-                "type": "integer",
-                "title": "The Copay Schema",
-                "default": 0,
-                "examples": [
-                  12
-                ]
-              },
-              "objectId": {
-                "type": "string",
-                "title": "The Objectid Schema",
-                "default": "",
-                "examples": [
-                  "1234512xvc1314asdfs"
-                ]
-              },
-              "objectType": {
-                "type": "string",
-                "title": "The Objecttype Schema",
-                "default": "",
-                "examples": [
-                  "membercostshare"
-                ]
-              }
+              "required": [
+                "deductible",
+                "_org",
+                "copay",
+                "objectId",
+                "objectType"
+              ]
+            },
+            "_org": {
+              "type": "string"
+            },
+            "objectId": {
+              "type": "string"
+            },
+            "objectType": {
+              "type": "string"
             }
           },
-          "_org": {
-            "type": "string",
-            "title": "The _org Schema",
-            "default": 0,
-            "examples": [
-              2
-            ]
-          },
-          "objectId": {
-            "type": "string",
-            "title": "The Objectid Schema",
-            "default": "",
-            "examples": [
-              "27283xvx9asdff"
-            ]
-          },
-          "objectType": {
-            "type": "string",
-            "title": "The Objecttype Schema",
-            "default": "",
-            "examples": [
-              "planservice"
-            ]
-          }
+          "required": [
+            "linkedService",
+            "planserviceCostShares",
+            "_org",
+            "objectId",
+            "objectType"
+          ]
         }
-      }
+      ]
     },
     "_org": {
-      "type": "string",
-      "title": "The _org Schema",
-      "default": "",
-      "examples": [
-        "example.com"
-      ]
+      "type": "string"
     },
     "objectId": {
-      "type": "string",
-      "title": "The Objectid Schema",
-      "default": "",
-      "examples": [
-        "12xvxc345ssdsds"
-      ]
+      "type": "string"
     },
     "objectType": {
-      "type": "string",
-      "title": "The Objecttype Schema",
-      "default": "",
-      "examples": [
-        "plan"
-      ]
+      "type": "string"
     },
     "planType": {
-      "type": "string",
-      "title": "The Plantype Schema",
-      "default": "",
-      "examples": [
-        "inNetwork"
-      ]
+      "type": "string"
     },
     "creationDate": {
-      "type": "string",
-      "title": "The Creationdate Schema",
-      "default": "",
-      "examples": [
-        "12-12-2017"
-      ]
+      "type": "string"
     }
-  }
+  },
+  "required": [
+    "planCostShares",
+    "linkedPlanServices",
+    "_org",
+    "objectId",
+    "objectType",
+    "planType",
+    "creationDate"
+  ]
 }

@@ -7,7 +7,7 @@ public class RedisConnection {
 
 	public static Jedis getConnection() {
 			Jedis jedis = new Jedis();
-			System.out.println("Connected to server sucessfully");
+			System.out.println("Connected to server sucessfully. Congrats Yiyi");
 			return jedis;
 	}
 }

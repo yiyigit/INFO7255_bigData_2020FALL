@@ -6,7 +6,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 import connection.RedisConnection;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import redis.clients.jedis.Jedis;
 import validator.Validator;
 
@@ -26,21 +26,20 @@ public class HelloController{
     
 	@RequestMapping("/")
     public String index() {
-        return "Greetings from Spring Boot!";
+        return "Greetings from Yiyi!";
     }
     
     @RequestMapping(value="/plan", method=RequestMethod.POST)
     public String addPlan(@RequestBody JSONObject jsonObject, HttpServletResponse response) throws IOException, ProcessingException
     {
-    	String data = jsonObject.toString();
-    	Boolean jsonValidity = Validator.isJSONValid(data);
+		String data = jsonObject.toString();
+    	Boolean jsonValidity = Validator.isJSONValid(jsonObject);
     	if(jsonValidity == true) {
-    	String uuid = UUID.randomUUID().toString();
-    	String key = "key"+uuid;
-    	jedis.set(key,data);
-    	return key + " inserted successfully";
-    	}
-    	else {
+			String uuid = UUID.randomUUID().toString();
+			String key = "key"+uuid;
+			jedis.set(key,data);
+			return key + " inserted successfully";
+    	}else {
     		response.setStatus(400);
 			return "JSON Schema not valid!";
     	}
@@ -70,7 +69,7 @@ public class HelloController{
     	jedis.connect();
     	String key = id;
     	String data = jsonObject.toString();
-    	Boolean jsonValidity = Validator.isJSONValid(data);
+    	Boolean jsonValidity = Validator.isJSONValid(jsonObject);
     	if(jsonValidity == true) {
     		jedis.set(key, data);
     		return key + " updated successfully!";
