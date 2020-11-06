@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
-Implementation-Title: gs-spring-boot
-Implementation-Version: 0.1.0
-Built-By: karan
-Implementation-Vendor-Id: org.springframework
-Build-Jdk: 1.8.0_161
-Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
- ot-starter-parent/gs-spring-boot
+Built-By: yiyizhou
+Build-Jdk: 15
+Implementation-Title: bigdataclassproject
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.example
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/bigdataclassproject
 Created-By: Maven Integration for Eclipse
 
