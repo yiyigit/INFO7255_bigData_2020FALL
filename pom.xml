@@ -68,6 +68,11 @@
     		<artifactId>json-simple</artifactId>
     		<version>1.1</version>
 		</dependency>
+		<dependency>
+		    <groupId>com.nimbusds</groupId>
+		    <artifactId>nimbus-jose-jwt</artifactId>
+		    <version>6.4</version>
+		</dependency>	
     </dependencies>
 
     <properties>
@@ -75,7 +80,6 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-
 
     <build>
         <plugins>
