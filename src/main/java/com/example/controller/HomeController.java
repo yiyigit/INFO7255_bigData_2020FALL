@@ -55,7 +55,6 @@ public class HomeController {
 	
 	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
-	private ShallowEtagHeaderFilter eTagFilter = new ShallowEtagHeaderFilter();
 	private RSAKey rsaPublicJWK;
 	// private JWSVerifier verifier;
 
@@ -67,33 +66,28 @@ public class HomeController {
 
 	// to read json instance from redis or cache
 	@GetMapping("/plan/{objectId}")
-	public ResponseEntity<String> getplan(@PathVariable(name="objectId", required=true) String objectId, @RequestHeader HttpHeaders requestHeaders) {		
+	public ResponseEntity getplan(@PathVariable(name="objectId", required=true) String objectId, @RequestHeader HttpHeaders requestHeaders) {		
 		LOG.info("Getting object with ID {}.", objectId);
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		
 		String res = null;
 		try {
 			if (!ifAuthorized(requestHeaders)) {
 				res = "{\"status\": \"Failed\",\"message\": \"Unauthorized\"}";
-				return new ResponseEntity<String>(res, headers, HttpStatus.BAD_REQUEST);
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
 			}
 			String jsonString = jedisBean.getFromDB(objectId);
-			System.out.println("jsonString: " + jsonString);
+			String formattedString = validator.getJsonObjectFromString(jsonString).toString();
 
-			if (jsonString == null || jsonString.equals("{}")) {
-				res = "{\"status\": \"Failed\",\"message\": \"Read unSuccessfulfull\"}";
-				return new ResponseEntity<String>(res, headers, HttpStatus.NOT_FOUND);
-			} else {
-				res = "{\"status\": \"Successful\",\"result\": " + jsonString + "}";
-//				System.out.println("res: " + res);
-				return new ResponseEntity<String>(res, headers, HttpStatus.OK);
-			}
+			System.out.println("jsonString: " + jsonString);
+			String etag = etagService.generateEtag(formattedString);
+			res = "{\"status\": \"Successful\",\"result\": " + formattedString + "}";
+			return ResponseEntity.ok().eTag(etag).body(res);			
 		} catch (Exception e) {
 			e.printStackTrace();
 			res = "{\"status\": \"Failed\",\"message\": \"Unauthorized\"}";
-			return new ResponseEntity<String>(res, headers, HttpStatus.BAD_REQUEST);		
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);		
 		}
 	}
 	
@@ -121,20 +115,13 @@ public class HomeController {
 					res = "{\"status\": \"Failed\",\"message\": \"objectId already exists.\"}";
 					return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);				
 				} else {
-					
-					// TODO
-					// Don't do it like this. I can't find etag in other request methods
-					String url = "http://localhost:8080/plan/" + jsonObject.getString("objectId");
-			        RestTemplate restTemplate = new RestTemplate();  
-			        HttpEntity<String> entity = new HttpEntity<String>("parameters", requestHeaders);     
-			        ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-			        HttpHeaders newHeaders = result.getHeaders();
-			        System.out.println("newHeaders: " + newHeaders);
-			        
-					elasticSearchConnect.runTask(jsonObject.getString("objectId"), jsonObject);
-
-					res = "{\"status\": \"Successful\",\"message\": \"" + jsonObject.getString("objectId") + " is inserted Successfulfully.\"}";
-					return new ResponseEntity<String>(res, newHeaders, HttpStatus.OK);
+					String objectId= jsonObject.getString("objectId");
+			        String jsonString = jedisBean.getFromDB(objectId);
+					String formattedString = jsonString.toString();
+					System.out.println("jsonString: " + jsonString);
+					String etag = etagService.generateEtag(formattedString);
+					res = "{\"status\": \"Successful\",\"result\": " + formattedString + "}";
+			return ResponseEntity.ok().eTag(etag).body(res);	
 				}
 			} else {
 				res = "{\"status\": \"Failed\",\"message\": \"Invalid JSON input against schema.\"}";
@@ -160,7 +147,7 @@ public class HomeController {
 		String res = null;
 		try {
 			if (!ifAuthorized(requestHeaders)) {
-				res = "{\"status\": \"Failed\",\"message\": \"Unauthorized\"}";
+				res = "user unauthorized";
 				return new ResponseEntity<String>(res, headers, HttpStatus.UNAUTHORIZED);
 			}
 			if (!jedisBean.doesKeyExist(objectId)) {
@@ -176,7 +163,7 @@ public class HomeController {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			res = "{\"status\": \"Failed\",\"message\": \"Unauthorized\"}";
+			res = "user unauthorized";
 			return new ResponseEntity<String>(res, headers, HttpStatus.UNAUTHORIZED);		
 		}
 	}
@@ -205,18 +192,16 @@ public class HomeController {
 				res = "{\"status\": \"Failed\",\"message\": \"Invalid JSON input against schema.\"}";
 				return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);
 			}
-			if (!jedisBean.update(jsonObject)) {
-				res = "{\"status\": \"Failed\",\"message\": \"Failed to update JSON instance in Redis\"}";
-				return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);
-			}
 
 			String jsonString = jedisBean.getFromDB(objectId);
-			if(etag !=null && !etag.equals(etagService.generateEtag(jsonString))){
+			String old_etag = etagService.generateEtag(jsonString);
+			
+			if(!etag.equals("\"" + old_etag + "\"")){
 				return new ResponseEntity<String>(res, HttpStatus.PRECONDITION_FAILED);
 			} else{
-			elasticSearchConnect.runTask(jsonObject.getString("objectId"), jsonObject);
-
-			res = "{\"status\": \"Successful\",\"message\": \"JSON instance updated in Redis\"}";
+			// elasticSearchConnect.runTask(jsonObject.getString("objectId"), jsonObject);
+			jedisBean.update(jsonObject);
+			res = "JSON instance updated in Redis" + jsonObject.toString();
 			return new ResponseEntity<String>(res, HttpStatus.OK);
 			}
 		} catch (Exception e) {
@@ -227,11 +212,9 @@ public class HomeController {
 	}
 
 	
-	// must include objectId and objectType
 	@PatchMapping("/plan/{objectId}")
-	public ResponseEntity<String> patchplan(@PathVariable(name="objectId", required=true) String objectId, @RequestBody(required=true) String body, @RequestHeader HttpHeaders requestHeaders) {
+	public ResponseEntity<String> patchplan(@RequestHeader(value="If-Match", required=false) String etag,@PathVariable(name="objectId", required=true) String objectId, @RequestBody(required=true) String body, @RequestHeader HttpHeaders requestHeaders) {
 		
-		// else
 		Schema schema = validator.getSchema();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -248,27 +231,21 @@ public class HomeController {
 			}
 			
 			JSONObject jsonObject = validator.getJsonObjectFromString(body);
-			
-//			if (!validator.validate(jsonObject)) {
-//				res = "{\"status\": \"Failed\",\"message\": \"Invalid JSON input against schema.\"}";
-//				return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);
-//			}
 			if (!jedisBean.update(jsonObject)) {
 				res = "{\"status\": \"Failed\",\"message\": \"Failed to update JSON instance in Redis\"}";
 				return new ResponseEntity<String>(res, HttpStatus.BAD_REQUEST);
 			}
-	        
-			// TODO
-			// Don't do it like this. I can't find etag in other request methods
-	        String url = "http://localhost:8080/plan/" + jsonObject.getString("objectId");
-	        RestTemplate restTemplate = new RestTemplate();  
-	        HttpEntity<String> entity = new HttpEntity<String>("parameters", requestHeaders);     
-	        ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-	        HttpHeaders newHeaders = result.getHeaders();
-	        System.out.println("newHeaders: " + newHeaders);
-	        
-			res = "{\"status\": \"Successful\",\"message\": \"JSON instance updated in Redis\"}";
-			return new ResponseEntity<String>(res, newHeaders, HttpStatus.OK);
+	        String jsonString = jedisBean.getFromDB(objectId);
+			String old_etag = etagService.generateEtag(jsonString);
+			System.out.println(old_etag);
+			if(!etag.equals("\"" + old_etag + "\"")){
+				return new ResponseEntity<String>("please get the latest etag", HttpStatus.PRECONDITION_FAILED);
+			} else{
+			// elasticSearchConnect.runTask(jsonObject.getString("objectId"), jsonObject);
+				jedisBean.update(jsonObject);
+			res = "JSON instance updated in Redis" + jsonObject.toString();
+			return new ResponseEntity<String>(res, HttpStatus.OK);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			res = "{\"status\": \"Failed\",\"message\": \"Unauthorized\"}";
@@ -309,8 +286,7 @@ public class HomeController {
 		// -jPDm5Iq0SZnjKjCNS5Q15fokXZc8u0A
 		String token = signedJWT.serialize();
 		
-		String res = "{\"status\": \"Successful\",\"token\": \"" + token + "\"}";
-		return new ResponseEntity<String>(res, HttpStatus.OK);
+		return new ResponseEntity<String>(token, HttpStatus.OK);
 	
 	}
 	

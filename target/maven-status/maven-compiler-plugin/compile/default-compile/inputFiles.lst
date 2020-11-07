@@ -4,3 +4,4 @@
 /Users/yiyizhou/Documents/demo/gs-spring-boot-complete/src/main/java/com/example/config/RedisConfig.java
 /Users/yiyizhou/Documents/demo/gs-spring-boot-complete/src/main/java/com/example/beans/JedisBean.java
 /Users/yiyizhou/Documents/demo/gs-spring-boot-complete/src/main/java/com/example/beans/MyJsonValidator.java
+/Users/yiyizhou/Documents/demo/gs-spring-boot-complete/src/main/java/com/example/beans/EtagBean.java

@@ -6,13 +6,13 @@
       "type": "object",
       "properties": {
         "deductible": {
-          "type": "integer"
+          "type": "string"
         },
         "_org": {
           "type": "string"
         },
         "copay": {
-          "type": "integer"
+          "type": "string"
         },
         "objectId": {
           "type": "string"
@@ -62,13 +62,13 @@
               "type": "object",
               "properties": {
                 "deductible": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "_org": {
                   "type": "string"
                 },
                 "copay": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "objectId": {
                   "type": "string"
@@ -133,13 +133,13 @@
               "type": "object",
               "properties": {
                 "deductible": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "_org": {
                   "type": "string"
                 },
                 "copay": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "objectId": {
                   "type": "string"

@@ -21,20 +21,4 @@ public class Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-	
-	@Bean
-    public Filter filter(){
-        ShallowEtagHeaderFilter filter = new ShallowEtagHeaderFilter();
-        return filter;
-    }
-	
-	@Bean
-	public FilterRegistrationBean<ShallowEtagHeaderFilter> shallowEtagHeaderFilter() {
-	    FilterRegistrationBean<ShallowEtagHeaderFilter> filterRegistrationBean
-	      = new FilterRegistrationBean<>( new ShallowEtagHeaderFilter());
-	    filterRegistrationBean.addUrlPatterns("/*");
-	    filterRegistrationBean.setName("etagFilter");
-	    return filterRegistrationBean;
-	}
-
 }

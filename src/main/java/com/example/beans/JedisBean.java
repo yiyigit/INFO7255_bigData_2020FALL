@@ -38,7 +38,6 @@ public class JedisBean {
 	
 	public String getFromDB(String objectId) {		
 		
-		// System.out.printf("Getting object {} from database.\n", objectId);
 		LOG.info("Getting object {} from database.", objectId);
 		
 		JSONObject jsonObject = getHelper("plan" + SEP + objectId);
@@ -54,11 +53,11 @@ public class JedisBean {
 		try {
 			Jedis jedis = pool.getResource();
 			JSONObject jsonObj = new JSONObject();
-			System.out.println("Reading keys from pattern");
 			Set<String> keys = jedis.keys(uuid + SEP + "*");
 		
 			// object members
 			for(String key : keys) {
+				// System.out.println("Reading keys from: " + key);
 				Set<String> jsonKeySet = jedis.smembers(key);				
 				if(jsonKeySet.size() > 1) {					
 					JSONArray jsonArr = new JSONArray();
@@ -75,14 +74,13 @@ public class JedisBean {
 					}
 					jsonObj.put(key.substring(key.lastIndexOf(SEP) + 4), embdObject);
 				}
-			}
-			
+			}			
 			// simple members
 			Map<String,String> simpleMap = jedis.hgetAll(uuid);
 			for(String simpleKey : simpleMap.keySet()) {
 				jsonObj.put(simpleKey, simpleMap.get(simpleKey));
 			}
-//			System.out.println("jsonObj: " + jsonObj);
+			// System.out.println("jsonObj: " + jsonObj);
 
 			jedis.close();
 			return jsonObj;
@@ -113,8 +111,10 @@ public class JedisBean {
 			
 			for(Object key : jsonObject.keySet()) {
 				String attributeKey = String.valueOf(key);
-				Object attributeVal = jsonObject.get(String.valueOf(key));
+				Object attributeVal = jsonObject.get(attributeKey);
 				String edge = attributeKey;
+				// LOG.info(uuid, "iterating json object keyset: {}", edge);
+
 				if(attributeVal instanceof JSONObject) {
 					
 					JSONObject embdObject = (JSONObject) attributeVal;
@@ -125,20 +125,26 @@ public class JedisBean {
 					
 				} else if (attributeVal instanceof JSONArray) {
 					
-					JSONArray jsonArray = (JSONArray) attributeVal;
-					Iterator<Object> jsonIterator = jsonArray.iterator();
+					JSONArray jsonArray =  new JSONArray(String.valueOf(attributeVal));
+					// Iterator<Object> jsonIterator = jsonArray.iterator();
 					String setKey = uuid + SEP + edge;
 					
-					while(jsonIterator.hasNext()) {
-						JSONObject embdObject = (JSONObject) jsonIterator.next();
+					// while(jsonIterator.hasNext()) {
+					for(int i=0;i<jsonArray.length();i++){
+						JSONObject embdObject = jsonArray.getJSONObject(i);
 						String embd_uuid = embdObject.get("objectType") + SEP + embdObject.getString("objectId");
 						jedis.sadd(setKey, embd_uuid);
 						addHelper(embdObject, embd_uuid);
 					}
+					// }
 					
 				} else {
 					simpleMap.put(attributeKey, String.valueOf(attributeVal));
 				}
+			}
+			JSONObject resultObj = new JSONObject();
+			for(String simpleKey : simpleMap.keySet()) {
+				resultObj.put(simpleKey, simpleMap.get(simpleKey));
 			}
 			jedis.hmset(uuid, simpleMap);
 			jedis.close();
@@ -207,7 +213,7 @@ public class JedisBean {
 					
 				} else if (attributeVal instanceof JSONArray) {
 					
-					JSONArray jsonArray = (JSONArray) attributeVal;
+					JSONArray jsonArray =  new JSONArray(String.valueOf(attributeVal));
 					Iterator<Object> jsonIterator = jsonArray.iterator();
 					String setKey = uuid + SEP + edge;
 					
