@@ -1,0 +1,85 @@
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+DELETE plan
+
+
+PUT plan 
+{
+ "mappings": {
+   "properties": {
+     "objectId":{
+       "type":"keyword"
+     },
+     "plan_service":{
+       "type":"join",
+       "relations":{
+         "plan":["membercostshare","planservice"],
+         "planservice":["service","planservice_membercostshare"]
+       }
+     }
+   }
+ }
+}
+
+
+GET plan/_search
+{
+  "query":{
+    "match_all":{}
+  }
+}
+
+#SIMPLE QUERY
+GET plan/_search
+{
+  "query":{
+    "match":{
+      "_id":"12xvxc345ssdsds-508"
+    }
+  }
+}
+
+#HAS CHILD
+GET plan/_search
+{
+  "query":{
+    "has_child":{
+      "type":"membercostshare",
+      "query": {
+        "range":{
+          "copay":{
+            "gte":"0"
+          }          
+        }
+      }
+    }    
+  }
+}
+
+GET plan/_search
+{
+  "query":{
+    "has_child":{
+      "type":"planservice",
+      "query": {
+        "match_all": {}
+          }          
+        }
+      }
+}
+
+GET plan/_search
+{
+  "query":{
+    "has_parent":{
+      "parent_type":"plan",
+      "query": {
+        "match_all": {}
+          }          
+        }
+      }
+}
